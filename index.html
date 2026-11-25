@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#18272a" />
+    <title>Дальний свет — Бесконечное шоссе</title>
+    <meta name="description" content="Бесконечное шоссе. Восемь биомов и случайные встречи по пути." />
+    <link rel="icon" href="data:," />
+    <script type="module" crossorigin src="./assets/index-DB8-nYKx.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/three-core-B_lcoJ0A.js">
+    <link rel="modulepreload" crossorigin href="./assets/three-webgl-uevOqnpZ.js">
+    <link rel="stylesheet" crossorigin href="./assets/index-DfDyMS3j.css">
+  </head>
+  <body>
+    <main class="game" id="game">
+      <div class="sun" aria-hidden="true"></div>
+      <canvas id="game-canvas" aria-label="Бесконечное шоссе. W — газ, S — тормоз, A и D — руль."></canvas>
+      <div class="vignette" aria-hidden="true"></div>
+
+      <header class="top">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"><i></i></span>
+          <div><h1>Дальний свет</h1><p>Бесконечное шоссе</p></div>
+        </div>
+        <div class="location" title="Текущий биом"><span class="location-pin" aria-hidden="true"></span><span data-ui="biome">Америка</span></div>
+        <div class="top-right">
+          <dl class="trip">
+            <div><dt>Путь</dt><dd><span data-ui="distance">0.00</span> <small>км</small></dd></div>
+            <div><dt>Кошелёк</dt><dd data-ui="cash">$250</dd></div>
+          </dl>
+          <div class="tools">
+            <button class="icon-button" type="button" data-ui="sound" aria-label="Включить звук" title="Включить звук" aria-pressed="false"><span class="speaker" aria-hidden="true"></span></button>
+            <button class="icon-button" type="button" data-ui="pause" aria-label="Пауза" title="Пауза · Esc"><span class="pause-icon" aria-hidden="true"></span></button>
+          </div>
+        </div>
+      </header>
+
+      <div class="speedometer" data-ui="gauge" aria-label="Текущая скорость">
+        <div class="speed-ring" aria-hidden="true"></div>
+        <div class="speed-reading"><span data-ui="speed">000</span><small>км/ч</small></div>
+        <div class="meter-marks" aria-hidden="true"><span>0</span><span>160</span></div>
+        <div class="boost" data-ui="boost" hidden></div>
+      </div>
+
+      <div class="keys" aria-label="Управление с клавиатуры">
+        <div><kbd>W</kbd><span>Газ</span></div>
+        <div><kbd>S</kbd><span>Тормоз</span></div>
+        <div><kbd>A</kbd><kbd>D</kbd><span>Руль</span></div>
+      </div>
+
+      <div class="touch" aria-label="Сенсорное управление">
+        <div>
+          <button type="button" data-key="KeyA" aria-label="Влево">‹</button>
+          <button type="button" data-key="KeyD" aria-label="Вправо">›</button>
+        </div>
+        <div>
+          <button type="button" data-key="KeyS" aria-label="Тормоз">Тормоз</button>
+          <button class="gas" type="button" data-key="KeyW" aria-label="Газ">Газ</button>
+        </div>
+      </div>
+
+      <button class="interaction" type="button" data-ui="interact" hidden><kbd>E</kbd><span>Подобрать попутчика</span></button>
+      <div class="toast" data-ui="toast" role="status" hidden></div>
+      <div class="billboard-label" data-ui="billboard" hidden><strong></strong><small>Кликни, чтобы открыть</small></div>
+
+      <dialog class="modal" data-ui="dialog" aria-labelledby="dialog-title">
+        <div class="modal-inner">
+          <p class="modal-eyebrow" data-ui="eyebrow"></p>
+          <h2 id="dialog-title" data-ui="title"></h2>
+          <p class="modal-body" data-ui="body"></p>
+          <div class="modal-actions" data-ui="actions"></div>
+        </div>
+      </dialog>
+      <p id="game-error" role="alert" hidden>Не удалось запустить 3D-сцену. Проверьте поддержку WebGL 2 в браузере.</p>
+    </main>
+  </body>
+</html>
