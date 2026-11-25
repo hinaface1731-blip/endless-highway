@@ -68,6 +68,7 @@ export class Input {
 
   private onDown = (event: KeyboardEvent) => {
     if (document.querySelector('dialog[open]') || event.ctrlKey || event.metaKey || event.altKey) return;
+    if (event.target instanceof HTMLElement && event.target.closest('#radio-panel')) return;
     const key = aliases.get(event.code);
     if (key) {
       event.preventDefault();

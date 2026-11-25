@@ -13,6 +13,7 @@ import { EngineAudio } from './audio';
 import { Input } from './input';
 import { startLoop } from './loop';
 import { Progress } from './progress';
+import { mountRadio } from './radio';
 
 const roadSeed = 91872;
 const scenerySeed = 14470;
@@ -46,6 +47,7 @@ export function mountScene(canvas: HTMLCanvasElement): () => void {
   const input = new Input();
   const progress = new Progress();
   const audio = new EngineAudio();
+  const disposeRadio = mountRadio();
   const events = new RoadEvents(world, road, biomes, driver, ui, seed ^ 27731);
   const billboards = new Billboards(canvas, camera, road, biomes, ui.billboard, billboardSeed);
   const chunks = new ChunkStream(world, road, biomes, scenerySeed, (chunk) => events.consider(chunk), (chunk) => {
@@ -137,6 +139,7 @@ export function mountScene(canvas: HTMLCanvasElement): () => void {
   ui.sound.addEventListener('click', async () => { ui.setSound(await audio.toggle()); }, { signal });
   window.addEventListener('keydown', (event) => {
     if (event.code === 'Escape' && !event.repeat && !ui.hasDialog) {
+      if (document.querySelector('#radio-panel:popover-open')) return;
       event.preventDefault();
       pause();
     }
@@ -220,6 +223,7 @@ export function mountScene(canvas: HTMLCanvasElement): () => void {
     events.dispose();
     driver.model.dispose();
     billboards.dispose();
+    disposeRadio();
     audio.dispose();
     renderer.dispose();
   };

@@ -9,6 +9,7 @@ export const config = {
     chunkLength: 50, ahead: 10, behind: 3, sampleSpacing: 2.5,
     roadWidth: 8.6, shoulderWidth: 1.45, maxTurnDegrees: 5, maxHeadingDegrees: 28,
     maxGrade: 0.085, noiseScale: 0.0052, grassPerChunk: 100, lodDistance: 155, rebaseInterval: 500,
+    mountainSetback: 10, mountainPlacementStep: 8,
     terrainOffsets: [-185, -140, -100, -70, -48, -32, -21, -13, -8.5, -5.75, 0, 5.75, 8.5, 13, 21, 32, 48, 70, 100, 140, 185],
   },
   lighting: { sky: 0xffefd9, ground: 0xa38070, ambientIntensity: 2.05, sun: 0xffe8ce, sunIntensity: 2.15, sunPosition: [-35, 27, -42] },

@@ -186,9 +186,19 @@ export class ChunkStream {
       const sample = this.road.sample(distance);
       const mix = this.biomes.at(distance);
       const relief = MathUtils.lerp(mix.from.relief, mix.to.relief, mix.blend);
-      const position = this.road.terrain(sample, offset, relief).sub(center);
+      const position = this.road.terrain(sample, offset, relief);
+      if (kind === 'peak' || kind === 'mesa') {
+        const footprint = this.scenery.footprint(kind) * Math.max(scale.x, scale.z);
+        const gap = footprint + shoulderEdge + config.world.mountainSetback;
+        const limit = terrainOffsets[terrainOffsets.length - 1] - config.world.mountainPlacementStep;
+        while (!this.road.clearsRoad(distance, position, gap)) {
+          offset += Math.sign(offset) * config.world.mountainPlacementStep;
+          if (Math.abs(offset) > limit) return;
+          position.copy(this.road.terrain(sample, offset, relief));
+        }
+      }
       if (!batches.has(kind)) batches.set(kind, []);
-      batches.get(kind)!.push({ position, scale, angle, color });
+      batches.get(kind)!.push({ position: position.sub(center), scale, angle, color });
     };
 
     for (const prop of initialRoadside) {
@@ -230,6 +240,7 @@ export class ChunkStream {
       for (const detailed of [true, false]) {
         const visible = detailed ? instances : instances.filter((_, i) => kind !== 'grass' || i % 3 === 0);
         const mesh = new InstancedMesh(this.scenery.geometry(kind, detailed), this.scenery.material, visible.length);
+        mesh.name = kind;
         visible.forEach(({ position, scale, angle, color }, i) => {
           dummy.position.copy(position);
           dummy.scale.copy(scale);

@@ -1,9 +1,8 @@
-import {
-  BufferAttribute, Color, Group, Mesh, MeshLambertMaterial, MeshStandardMaterial, ConeGeometry, CylinderGeometry,
-} from 'three';
+import { BufferAttribute, Color, Group, Mesh, MeshLambertMaterial, MeshStandardMaterial, CylinderGeometry } from 'three';
 import type { BufferGeometry, Material } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { Prop } from '../config/biomes';
+import { alpinePeak, gableRoof } from './landforms';
 import { cone, cube, cylinder, geometryForBaking, material, orb, piece, stone } from './primitives';
 
 const leaf = material(0x54764a);
@@ -24,7 +23,8 @@ const cactus = material(0x687f54);
 const cDark = material(0x526845);
 const thinCyl = new CylinderGeometry(1, 1, 1, 6);
 const mesa = new CylinderGeometry(0.67, 1, 1, 7);
-const roofShape = new CylinderGeometry(0.91, 0.91, 1, 3, 1);
+const roofShape = gableRoof();
+const peak = alpinePeak();
 const flag = material(0xd9a264);
 
 function bake(group: Group) {
@@ -49,7 +49,7 @@ type MeshPart = (geometry: BufferGeometry, surface: Material, x: number, y: numb
 
 function house(make: MeshPart, barn: boolean, detailed: boolean) {
   make(cube, barn ? rust : plaster, 0, 1.35, 0, 4.4, 2.7, 3.2);
-  make(roofShape, barn ? tan : roof, 0, 2.8, 0, 2.95, 3.75, 1.75).rotateX(Math.PI / 2);
+  make(roofShape, barn ? tan : roof, 0, 2.68, 0, 4.75, barn ? 1.55 : 1.15, 3.61);
   make(cube, shadow, 0.6, 0.85, 1.62, barn ? 1.5 : 0.72, 1.7, 0.06);
   if (detailed) {
     make(cube, shadow, -1.25, 1.55, 1.62, 0.83, 0.78, 0.06);
@@ -127,9 +127,8 @@ function construct(kind: Prop | 'mesa' | 'grass' | 'gravel', detailed: boolean) 
       if (kind === 'rock' && detailed) make(stone, sand, 0.55, 0.14, 0.33, 0.38, 0.27, 0.45);
       break;
     case 'peak':
-      make(cone, stoneGrey, 0, 0.36, 0, 1.13, 1.18, 0.94);
-      make(cone, snow, 0, 0.82, 0, 0.34, 0.28, 0.28);
-      if (detailed) make(cone, stoneGrey, 0.62, 0.22, 0.06, 0.67, 0.84, 0.62).rotation.z = -0.24;
+      make(peak.rock, stoneGrey, 0, 0, 0, 1, 1, 1);
+      make(peak.snow, snow, 0, 0, 0, 1, 1, 1);
       break;
     case 'mesa':
       make(mesa, rust, 0, 0.32, 0, 1.35, 0.79, 0.97);
@@ -162,6 +161,7 @@ export type SceneryKind = Prop | 'mesa' | 'grass' | 'gravel';
 export class SceneryAssets {
   readonly material = new MeshLambertMaterial({ vertexColors: true, flatShading: true });
   private readonly cache = new Map<string, BufferGeometry>();
+  private readonly footprints = new Map<SceneryKind, number>();
 
   geometry(kind: SceneryKind, detailed: boolean) {
     const key = kind + (detailed ? '/near' : '/far');
@@ -171,6 +171,18 @@ export class SceneryAssets {
       this.cache.set(key, geometry);
     }
     return geometry;
+  }
+
+  footprint(kind: SceneryKind) {
+    let radius = this.footprints.get(kind);
+    if (radius !== undefined) return radius;
+    radius = 0;
+    for (const detailed of [true, false]) {
+      const positions = this.geometry(kind, detailed).getAttribute('position');
+      for (let i = 0; i < positions.count; i++) radius = Math.max(radius, Math.hypot(positions.getX(i), positions.getZ(i)));
+    }
+    this.footprints.set(kind, radius);
+    return radius;
   }
 
   dispose() {

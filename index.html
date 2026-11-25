@@ -26,11 +26,23 @@
             <div><dt>Кошелёк</dt><dd data-ui="cash">$250</dd></div>
           </dl>
           <div class="tools">
+            <button class="icon-button" type="button" data-ui="radio" aria-label="Радио" title="Радио" popovertarget="radio-panel"><span class="radio-icon" aria-hidden="true"></span></button>
             <button class="icon-button" type="button" data-ui="sound" aria-label="Включить звук" title="Включить звук" aria-pressed="false"><span class="speaker" aria-hidden="true"></span></button>
             <button class="icon-button" type="button" data-ui="pause" aria-label="Пауза" title="Пауза · Esc"><span class="pause-icon" aria-hidden="true"></span></button>
           </div>
         </div>
       </header>
+
+      <section class="radio-panel" id="radio-panel" popover="auto" aria-labelledby="radio-heading">
+        <h2 id="radio-heading">Радио</h2>
+        <label for="radio-station">Станция</label>
+        <select id="radio-station"></select>
+        <div class="radio-playback">
+          <button type="button" id="radio-play">Слушать</button>
+          <p id="radio-status" role="status">Радио выключено</p>
+        </div>
+        <label class="radio-volume" for="radio-volume">Громкость <input id="radio-volume" type="range" min="0" max="100" value="40" /></label>
+      </section>
 
       <div class="speedometer" data-ui="gauge" aria-label="Текущая скорость">
         <div class="speed-ring" aria-hidden="true"></div>

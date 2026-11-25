@@ -1,5 +1,5 @@
 import {
-  Camera, CanvasTexture, DoubleSide, Group, MathUtils, Mesh, MeshBasicMaterial,
+  Camera, CanvasTexture, Group, MathUtils, Mesh, MeshBasicMaterial,
   PlaneGeometry, Raycaster, SRGBColorSpace, TextureLoader, Vector2, Vector3,
 } from 'three';
 import type { Texture } from 'three';
@@ -72,7 +72,7 @@ export class Billboards {
     for (const ad of advertisers) {
       const placeholder = fallback(ad);
       this.textures.add(placeholder);
-      const surface = new MeshBasicMaterial({ map: placeholder, side: DoubleSide, toneMapped: false });
+      const surface = new MeshBasicMaterial({ map: placeholder, toneMapped: false });
       this.surfaces.set(ad, surface);
       if (ad.image) loader.load(ad.image, (texture) => {
         if (this.disposed) {
@@ -111,19 +111,28 @@ export class Billboards {
     const angle = -sample.heading - side * 0.34;
     group.rotation.y = angle;
     const { width, height, lift } = spec;
+    const postHeight = lift - height / 2;
     for (const x of [-width * 0.32, width * 0.32]) {
-      piece(group, cube, surface.post, x, (lift + 0.65) / 2, -0.13, biome.sign === 'metal' ? 0.18 : 0.24, lift + 0.65, 0.32);
+      piece(group, cube, surface.post, x, postHeight / 2, 0, biome.sign === 'metal' ? 0.18 : 0.24, postHeight, 0.23);
     }
-    piece(group, cube, surface.frame, 0, lift, 0, width + 0.27, height + 0.25, 0.26);
+    const rim = 0.14;
+    for (const edge of [-1, 1]) {
+      piece(group, cube, surface.frame, 0, lift + edge * (height + rim) / 2, 0, width + 2 * rim, rim, 0.26);
+      piece(group, cube, surface.frame, edge * (width + rim) / 2, lift, 0, rim, height, 0.26);
+    }
     if (biome.sign === 'metal') {
-      piece(group, cube, surface.post, 0, lift * 0.43, -0.15, 0.11, width * 0.72, 0.18).rotation.z = 0.71;
-      piece(group, cube, surface.post, 0, lift * 0.43, -0.15, 0.11, width * 0.72, 0.18).rotation.z = -0.71;
+      const span = width * 0.64;
+      const length = Math.hypot(span, postHeight);
+      const slant = Math.atan2(span, postHeight);
+      for (const side of [-1, 1]) {
+        piece(group, cube, surface.post, 0, postHeight / 2, 0, 0.11, length, 0.18).rotation.z = side * slant;
+      }
     }
     if (biome.sign === 'overgrown') {
       for (let i = 0; i < 8; i++) piece(group, stone, ivy, -width * 0.51 + Math.sin(i * 1.2) * 0.37, lift - height * 0.68 + i * height / 7, 0.19, 0.49, 0.47, 0.33);
     }
     const faces = [-1, 1].map((faceSide) => {
-      const face = piece(group, panel, this.surfaces.get(ad)!, 0, lift, faceSide * 0.136, width, height, 1);
+      const face = piece(group, panel, this.surfaces.get(ad)!, 0, lift, faceSide * 0.13, width, height, 1);
       if (faceSide < 0) face.rotateY(Math.PI);
       face.userData = { url: ad.url, companyName: ad.companyName };
       return face;

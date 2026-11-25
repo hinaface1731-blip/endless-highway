@@ -77,6 +77,20 @@ export class Road {
     return new Vector3(x, position.y - 0.09 + hill * blend * relief, z);
   }
 
+  clearsRoad(distance: number, position: Vector3, minimumGap: number) {
+    const { sampleSpacing } = config.world;
+    const gap = minimumGap + sampleSpacing;
+    // The heading limit keeps the road advancing along -Z, even through curves.
+    const span = (gap + Math.abs(position.z - this.sample(distance).position.z)) / 0.8;
+    const start = Math.max(0, distance - span);
+    const end = distance + span;
+    for (let along = start; along <= end + sampleSpacing; along += sampleSpacing) {
+      const point = this.sample(along).position;
+      if (Math.hypot(point.x - position.x, point.z - position.z) < gap) return false;
+    }
+    return true;
+  }
+
   trim(before: number) {
     while (this.firstIndex < before && this.firstIndex < this.lastIndex) {
       this.knots.delete(this.firstIndex++);
